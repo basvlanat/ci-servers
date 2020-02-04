@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+TOKEN="bot941335812:AAE7_J46aDXY53RnHj81fXLP8IFKfo7zQ24"
+ID="-357932131"
+URL="https://api.telegram.org/bot${TOKEN}/sendMessage"
+
+declare -A LEVEL
+
+LEVEL[GREEN]="✅"
+LEVEL[YELLOW]="⚠️"
+LEVEL[RED]="❌"
+
+STATE=$2
+NAME_SERVICE=$3
+GIT=(${4//%s/ })
+AUTHOR=(${GIT[2]//\@/ })
+MESSAGE=$5
+
+Tamplate="${LEVEL[$1]} ${STATE} Build and Deploy ${LEVEL[$1]}
+service: *${NAME_SERVICE}*
+branch: *${GIT[0]}*
+commit: *${GIT[1]}*
+author: *${AUTHOR[0]}*
+message: *${MESSAGE}*"
+
+curl -s -X POST $URL -d chat_id=$ID -d parse_mode="markdown" -d text="${Tamplate}"

@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+  teamcity-server-vlad:
+    image: 'jetbrains/teamcity-server'
+    restart: always
+    hostname: 'teamcity-server-vlad'
+    container_name: teamcity-server-vlad
+    ports:
+      - '8520:8111'
+    volumes:
+      - './data:/data/teamcity_server/datadir'
+      - './logs:/opt/teamcity/logs'
+
+  teamcity-agent-vlad:
+    image: 'jetbrains/teamcity-agent'
+    restart: always
+    hostname: 'teamcity-agent-vlad'
+    container_name: teamcity-agent-vlad
+    volumes:
+      - './agent_data:/data/teamcity_agent/conf'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '/opt/buildagent/work:/opt/buildagent/work'
+      - '/opt/buildagent/temp:/opt/buildagent/temp'
+      - '/opt/buildagent/tools:/opt/buildagent/tools'
+      - '/opt/buildagent/plugins:/opt/buildagent/plugins'
+      - '/opt/buildagent/system:/opt/buildagent/system'
+    environment:
+            - SERVER_URL=http://teamcity-server-vlad:8111
+
+  gitlab-server-vlad:
+    image: 'gitlab/gitlab-ce:12.4.0-ce.0'
+    restart: always
+    hostname: 'gitlab-server-vlad'
+    container_name: gitlab-server-vlad 
+        
+    ports:
+      - '8383:80'
+      - '2323:22'
+    volumes:
+      - '/srv/gitlab_server_vlad/config:/etc/gitlab'
+      - '/srv/gitlab_server_vlad/logs:/var/log/gitlab'
+      - '/srv/gitlab_server_vlad/data:/var/opt/gitlab'
+
+  gitlab-runner-vlad:
+    image: gitlab/gitlab-runner:latest
+    restart: always
+    container_name: gitlab-runner-vlad
+    hostname: gitlab-runner-vlad
+    volumes:
+      - './gitlab-runner1-config:/etc/gitlab-runner:Z'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+
+
+  jenkins-master-vlad:
+    image: 'jenkinsci/blueocean:latest'
+    restart: always
+    user: root
+    hostname: 'jenkins-master-vlad'
+    container_name: jenkins-master-vlad 
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./jenkins_home/:/var/jenkins_home"
+      - "./telegramBot:/usr/bin/telegramBot"
+    ports:
+      - '7410:8080'
+      - '50001:50000'
