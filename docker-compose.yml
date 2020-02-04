@@ -1,67 +1,67 @@
 version: '3'
 
 services:
-  teamcity-server-vlad:
-    image: 'jetbrains/teamcity-server'
-    restart: always
-    hostname: 'teamcity-server-vlad'
-    container_name: teamcity-server-vlad
-    ports:
-      - '8520:8111'
-    volumes:
-      - './data:/data/teamcity_server/datadir'
-      - './logs:/opt/teamcity/logs'
 
-  teamcity-agent-vlad:
-    image: 'jetbrains/teamcity-agent'
-    restart: always
-    hostname: 'teamcity-agent-vlad'
-    container_name: teamcity-agent-vlad
-    volumes:
-      - './agent_data:/data/teamcity_agent/conf'
-      - '/var/run/docker.sock:/var/run/docker.sock'
-      - '/opt/buildagent/work:/opt/buildagent/work'
-      - '/opt/buildagent/temp:/opt/buildagent/temp'
-      - '/opt/buildagent/tools:/opt/buildagent/tools'
-      - '/opt/buildagent/plugins:/opt/buildagent/plugins'
-      - '/opt/buildagent/system:/opt/buildagent/system'
-    environment:
-            - SERVER_URL=http://teamcity-server-vlad:8111
-
-  gitlab-server-vlad:
-    image: 'gitlab/gitlab-ce:12.4.0-ce.0'
-    restart: always
-    hostname: 'gitlab-server-vlad'
-    container_name: gitlab-server-vlad 
-        
-    ports:
-      - '8383:80'
-      - '2323:22'
-    volumes:
-      - '/srv/gitlab_server_vlad/config:/etc/gitlab'
-      - '/srv/gitlab_server_vlad/logs:/var/log/gitlab'
-      - '/srv/gitlab_server_vlad/data:/var/opt/gitlab'
-
-  gitlab-runner-vlad:
-    image: gitlab/gitlab-runner:latest
-    restart: always
-    container_name: gitlab-runner-vlad
-    hostname: gitlab-runner-vlad
-    volumes:
-      - './gitlab-runner1-config:/etc/gitlab-runner:Z'
-      - '/var/run/docker.sock:/var/run/docker.sock'
-
-
-  jenkins-master-vlad:
+  jenkins-server:
     image: 'jenkinsci/blueocean:latest'
     restart: always
     user: root
-    hostname: 'jenkins-master-vlad'
-    container_name: jenkins-master-vlad 
+    hostname: 'jenkins-server'
+    container_name: jenkins-server 
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./jenkins_home/:/var/jenkins_home"
+      - "./data/jenkins/jenkins_home/:/var/jenkins_home"
       - "./telegramBot:/usr/bin/telegramBot"
     ports:
-      - '7410:8080'
-      - '50001:50000'
+      - '8080:8080'
+      - '50000:50000'
+
+  gitlab-server:
+    image: 'gitlab/gitlab-ce:12.4.0-ce.0'
+    restart: always
+    hostname: 'gitlab-server'
+    container_name: 'gitlab-server'      
+    ports:
+      - '8888:80'
+      - '2222:22'
+    volumes:
+      - './data/gitlab/srv/gitlab_server/config:/etc/gitlab'
+      - './data/gitlab/srv/gitlab_server/logs:/var/log/gitlab'
+      - './data/gitlab/srv/gitlab_server/data:/var/opt/gitlab'
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    restart: always
+    container_name: gitlab-runner
+    hostname: gitlab-runner
+    volumes:
+      - './data/gitlab/gitlab-runner1-config:/etc/gitlab-runner:Z'
+      - '/var/run/docker.sock:/var/run/docker.sock'      
+
+  teamcity-server:
+    image: 'jetbrains/teamcity-server'
+    restart: always
+    hostname: 'teamcity-server'
+    container_name: 'teamcity-server'
+    ports:
+      - '8111:8111'
+    volumes:
+      - './data/teamcity/data:/data/teamcity_server/datadir'
+      - './data/teamcity/logs:/opt/teamcity/logs'
+
+  teamcity-agent:
+    image: 'jetbrains/teamcity-agent'
+    restart: always
+    hostname: 'teamcity-agent'
+    container_name: 'teamcity-agent'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - './data/teamcity/agent_data:/data/teamcity_agent/conf'
+      - './data/teamcity/opt/buildagent/work:/opt/buildagent/work'
+      - './data/teamcity/opt/buildagent/temp:/opt/buildagent/temp'
+      - './data/teamcity/opt/buildagent/tools:/opt/buildagent/tools'
+      - './data/teamcity/opt/buildagent/plugins:/opt/buildagent/plugins'
+      - './data/teamcity/opt/buildagent/system:/opt/buildagent/system'
+    environment:
+      - SERVER_URL=http://teamcity-server:8111
+
